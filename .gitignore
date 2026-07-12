@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.pytest_cache/
+patel_platform.db
+.env
+* .db
+ingestion.db
