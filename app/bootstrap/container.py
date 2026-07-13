@@ -1,8 +1,8 @@
-from app.infrastructure.repositories.item_repository import ItemRepository
-from app.application.item.item_service import ItemService
+from app.infrastructure.repositories.document_repository import DocumentRepository
+from app.application.document.document_service import DocumentService
 
 
-def get_item_service(db):
-    repository = ItemRepository(db)
-    service = ItemService(repository)
+def get_document_service(db):
+    repository = DocumentRepository(db)
+    service = DocumentService(repository)
     return service

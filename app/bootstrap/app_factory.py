@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.core.config import settings
-from app.api.v1.routes.item_routes import router as item_router
+from app.api.v1.routes.document_routes import router as document_router
 from app.core.handlers import register_exception_handlers
 from app.infrastructure.db.session import engine
 from app.infrastructure.db.models import Base
@@ -23,6 +23,6 @@ def create_app() -> FastAPI:
     @app.get("/health")
     def health():
         return {"status": "ok"} 
-    app.include_router(item_router)
+    app.include_router(document_router)
 
     return app
