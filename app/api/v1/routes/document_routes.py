@@ -70,3 +70,15 @@ def delete_document(document_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Document not found")
 
     return {"message": "Document deleted successfully"}
+
+@router.post("/documents/upload", response_model=DocumentResponse)
+def upload_document(payload: DocumentCreateRequest, db = Depends(get_db)):
+
+    service = get_document_service(db)
+
+    document = service.create_document(
+
+        filename=payload.filename
+    )
+
+    return document

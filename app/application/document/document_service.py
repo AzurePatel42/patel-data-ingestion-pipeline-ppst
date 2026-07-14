@@ -1,6 +1,7 @@
-from app.domain.document.document_rules import DocumentRules
+
 from app.application.contracts.document_schemas import DocumentResponse
 from app.core.exceptions import NotFoundException
+from app.domain.document.document_status import DocumentStatus
 
 
 class DocumentService:
@@ -46,11 +47,11 @@ class DocumentService:
 
     def delete_document(self, document_id: int):
 
-        deleted = self.repo.get_by_id(document_id)
-        if not deleted:
+        document = self.repo.get_by_id(document_id)
+        if not document:
             raise NotFoundException("Document not found")
 
-        self.repo.delete(deleted)
+        self.repo.delete(document_id)
         return {"message": "Document deleted successfully"}
 
     def _to_response(self, document):
@@ -58,8 +59,19 @@ class DocumentService:
         return DocumentResponse(
             id=document.id,
             filename=document.filename,
-            supported=DocumentRules.is_supported_file(
-                document.filename
+            status=document.status
             )
-        )
+        
     
+    def update_document_status(self, document_id: int, status: DocumentStatus):
+        document = self.repo.get_by_id(document_id)
+
+        if document is None:
+            raise NotFoundException("Document not found")
+
+        updated_document = self.repo.update(
+            document_id,
+            status=status
+        )
+
+        return self._to_response(updated_document)

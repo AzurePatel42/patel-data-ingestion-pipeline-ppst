@@ -15,3 +15,10 @@ class DocumentModel(Base):
     status = Column(String)
 
     created_at = Column(String)
+
+    storage_path = Column(String)
+
+    file_size = Column(Integer)
+
+    processing_status = Column(String)
+    

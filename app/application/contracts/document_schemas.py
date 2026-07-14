@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from app.domain.document.document_status import DocumentStatus
 
 class DocumentCreateRequest(BaseModel):
     filename: str
@@ -12,4 +12,4 @@ class DocumentUpdateRequest(BaseModel):
 class DocumentResponse(BaseModel):
     id: int
     filename: str
-    supported: bool
+    status: DocumentStatus
