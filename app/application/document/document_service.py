@@ -2,6 +2,7 @@
 from app.application.contracts.document_schemas import DocumentResponse
 from app.core.exceptions import NotFoundException
 from app.domain.document.document_status import DocumentStatus
+from app.events.event_bus import EventBus
 
 
 class DocumentService:
@@ -12,6 +13,8 @@ class DocumentService:
     def create_document(self, filename: str):
 
         document = self.repo.create(filename=filename)
+
+        EventBus.publish("document_uploaded", {"document_id": document.id})
 
         return self._to_response(document)
 
