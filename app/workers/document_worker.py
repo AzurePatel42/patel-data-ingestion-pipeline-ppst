@@ -1,3 +1,4 @@
+from app.application.ingestion.text_extractor import TextExtractor
 from app.domain.document.document_status import DocumentStatus
 
 
@@ -11,14 +12,11 @@ class DocumentWorker:
         document.status = DocumentStatus.PROCESSING
 
         # Step 1
-        print("Extracting text...")
+        
+        text = TextExtractor.extract(document.file_path)
 
-        # Step 2
-        print("Chunking document...")
-
-        # Step 3
-        print("Generating embeddings...")
+        print(text)
 
         document.status = DocumentStatus.COMPLETED
 
-        print(f"Document {document.id} completed")
+        

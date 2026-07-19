@@ -1,4 +1,7 @@
-from app.infrastructure.logging.logger import logger
+from app.infrastructure.logging.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 
 class EventBus:
