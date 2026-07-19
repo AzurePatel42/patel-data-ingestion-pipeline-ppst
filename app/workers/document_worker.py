@@ -1,3 +1,6 @@
+from venv import logger
+
+from app.application.ingestion.chunking_service import ChunkingService
 from app.application.ingestion.text_extractor import TextExtractor
 from app.domain.document.document_status import DocumentStatus
 
@@ -19,4 +22,9 @@ class DocumentWorker:
 
         document.status = DocumentStatus.COMPLETED
 
+        # Step 2
+        
+        chunks = ChunkingService.chunk(text, chunk_size=1000)
+
+        logger.info(f"Created {len(chunks)} chunks.")
         
