@@ -1,19 +1,14 @@
+from .providers.embedding_provider import EmbeddingProvider
+
+
 class EmbeddingService:
 
-    @staticmethod
-    def generate(chunks: list[str]) -> list[list[float]]:
+    def __init__(self, provider: EmbeddingProvider):
+        self.provider = provider
+
+    def generate(self, chunks: list[str]) -> list[list[float]]:
         """
-        Placeholder embedding generator.
-
-        This will later be replaced by OpenAI or another
-        embedding model without changing the pipeline.
+        Generate embeddings using the configured provider.
         """
 
-        embeddings = []
-
-        for chunk in chunks:
-            embeddings.append([
-                float(len(chunk))
-            ])
-
-        return embeddings
+        return self.provider.generate(chunks)
