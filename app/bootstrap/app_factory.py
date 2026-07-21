@@ -1,3 +1,5 @@
+from app.application.ingestion.embedding_service import EmbeddingService
+from app.application.ingestion.providers.openai_provider import OpenAIEmbeddingProvider
 from fastapi import FastAPI
 
 from app.core.config import settings
@@ -19,6 +21,10 @@ def create_app() -> FastAPI:
 
     register_exception_handlers(app)
     
+    
+    provider = OpenAIEmbeddingProvider()
+
+    embedding_service = EmbeddingService(provider)
 
     @app.get("/health")
     def health():
