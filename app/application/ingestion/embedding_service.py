@@ -1,4 +1,5 @@
 from app.application.ingestion.providers.embedding_provider import EmbeddingProvider
+from app.domain.vector.repository import VectorRepository
 
 
 class EmbeddingService:
@@ -9,6 +10,14 @@ class EmbeddingService:
 
     def __init__(self, provider: EmbeddingProvider):
         self.provider = provider
+
+
+    def __init__(
+        self,
+        vector_repository: VectorRepository,
+    ):
+        self.vector_repository = vector_repository
+    
 
     def generate_embeddings(self, chunks: list[str]) -> list[list[float]]:
         """

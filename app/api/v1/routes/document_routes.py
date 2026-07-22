@@ -8,6 +8,11 @@ from app.application.contracts.document_schemas import DocumentCreateRequest, Do
 from app.bootstrap.container import get_document_service
 from app.infrastructure.db.deps import get_db
 
+from app.bootstrap.container import get_embedding_service
+from app.application.ingestion.embedding_service import EmbeddingService
+from app.application.contracts.ingestion_schemas import IngestRequest
+
+
 router = APIRouter()
 
 
@@ -82,3 +87,14 @@ def upload_document(payload: DocumentCreateRequest, db = Depends(get_db)):
     )
 
     return document
+
+@router.post("/ingest")
+def ingest(
+    request: IngestRequest,
+    db: Session = Depends(get_db),
+):
+
+    service = get_embedding_service(db)
+
+    return service.ingest(request)
+    

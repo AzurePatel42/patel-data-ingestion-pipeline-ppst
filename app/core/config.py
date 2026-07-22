@@ -15,7 +15,8 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "sqlite:///./ingestion.db"
 
-    OPENAI_API_KEY: str = ""
+    OPENAI_API_KEY: str 
+
 
     EMBEDDING_MODEL: str = "text-embedding-3-small"
 

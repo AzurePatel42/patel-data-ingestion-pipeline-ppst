@@ -5,3 +5,4 @@ patel_platform.db
 .env
 * .db
 ingestion.db
+.env.*
