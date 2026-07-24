@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from pgvector.sqlalchemy import cosine_distance
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.domain.vector.entities import VectorDocument
@@ -10,7 +11,7 @@ from app.infrastructure.vector.models import VectorDocumentModel
 
 class PgVectorRepository(VectorRepository):
     """
-    PostgreSQL + pgvector implementation of VectorRepository.
+    PostgreSQL + pgvector implementation of the VectorRepository contract.
     """
 
     def __init__(self, db: Session):
@@ -46,14 +47,25 @@ class PgVectorRepository(VectorRepository):
             created_at=model.created_at,
         )
 
-    def save(self, vector_document: VectorDocument) -> None:
+    def save(self, vector_document: VectorDocument) -> VectorDocument:
         """
         Persist a vector document.
+
+        Returns:
+            The persisted VectorDocument.
         """
         model = self._to_model(vector_document)
 
-        self.db.add(model)
-        self.db.commit()
+        try:
+            self.db.add(model)
+            self.db.commit()
+            self.db.refresh(model)
+
+            return self._to_domain(model)
+
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise
 
     def get_by_id(self, vector_id: UUID) -> VectorDocument | None:
         """
@@ -72,9 +84,16 @@ class PgVectorRepository(VectorRepository):
         """
         model = self.db.get(VectorDocumentModel, vector_id)
 
-        if model is not None:
+        if model is None:
+            return
+
+        try:
             self.db.delete(model)
             self.db.commit()
+
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise
 
     def similarity_search(
         self,
@@ -82,7 +101,7 @@ class PgVectorRepository(VectorRepository):
         top_k: int = 5,
     ) -> list[VectorDocument]:
         """
-        Return the most similar vector documents using cosine distance.
+        Return the top-k most similar vector documents using cosine distance.
         """
         models = (
             self.db.query(VectorDocumentModel)

@@ -6,7 +6,7 @@ from sqlalchemy import DateTime, Integer, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.infrastructure.database.base import Base
+from app.infrastructure.db.session import Base
 
 
 class VectorDocumentModel(Base):
