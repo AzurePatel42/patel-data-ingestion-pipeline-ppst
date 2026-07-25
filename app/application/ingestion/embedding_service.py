@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from app.application.ingestion.providers.embedding_provider import EmbeddingProvider
@@ -26,7 +26,7 @@ class EmbeddingService:
         self.provider = provider or OpenAIEmbeddingProvider()
         self.embedding_model = embedding_model
 
-    def ingest(
+    def create_vectors(
         self,
         document_id: UUID,
         chunks: list[str],
@@ -46,23 +46,29 @@ class EmbeddingService:
         if not chunks:
             return []
 
-        embeddings = self.provider.generate(chunks)
+        try:
+            embeddings = self.provider.generate(chunks)
+        except Exception as exc:
+            # Replace with EmbeddingGenerationError in a future iteration.
+            raise RuntimeError("Failed to generate embeddings.") from exc
 
         vector_documents: list[VectorDocument] = []
 
         for index, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
-            vector_document = VectorDocument(
-                id=uuid4(),
-                document_id=document_id,
-                chunk_index=index,
-                content=chunk,
-                embedding=embedding,
-                embedding_model=self.embedding_model,
-                created_at=datetime.now(UTC),
+            vector_documents.append(
+                VectorDocument(
+                    id=uuid4(),
+                    document_id=document_id,
+                    chunk_index=index,
+                    content=chunk,
+                    embedding=embedding,
+                    embedding_model=self.embedding_model,
+                    created_at=datetime.now(UTC),
+                )
             )
 
-            self.vector_repository.save(vector_document)
-            vector_documents.append(vector_document)
+        # Batch persistence (recommended)
+        self.vector_repository.save_all(vector_documents)
 
         return vector_documents
 
@@ -73,13 +79,6 @@ class EmbeddingService:
     ) -> list[VectorDocument]:
         """
         Perform semantic search using a text query.
-
-        Args:
-            query: Search text.
-            top_k: Maximum number of results.
-
-        Returns:
-            Most similar VectorDocument objects.
         """
 
         query_embedding = self.provider.generate([query])[0]

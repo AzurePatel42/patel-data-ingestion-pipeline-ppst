@@ -1,43 +1,50 @@
 from abc import ABC, abstractmethod
-from typing import List
 from uuid import UUID
 
 from app.domain.vector.entities import VectorDocument
 
 
 class VectorRepository(ABC):
+
     """
-    Contract for vector storage implementations.
-    """
+Repository contract for vector persistence.
 
-    @abstractmethod
-    def save(self, vector_document: VectorDocument) -> None:
-        """
-        Persist a vector document.
-        """
-        pass
+The application layer depends on this abstraction,
+allowing different vector storage implementations
+(pgvector, Pinecone, Qdrant, Weaviate, etc.)
+without changing business logic.
+"""
 
-    @abstractmethod
-    def get_by_id(self, vector_id: UUID) -> VectorDocument | None:
-        """
-        Retrieve a vector document by its ID.
-        """
-        pass
 
+    
     @abstractmethod
-    def delete(self, vector_id: UUID) -> None:
+    def save_all(
+        self,
+        vector_documents: list[VectorDocument],
+    ) -> None:
         """
-        Delete a vector document.
+        Persist multiple vector documents atomically.
         """
-        pass
+        ...
 
     @abstractmethod
     def similarity_search(
         self,
-        embedding: List[float],
-        top_k: int = 5,
-    ) -> List[VectorDocument]:
-        """
-        Return the most similar vector documents.
-        """
-        pass
+        embedding: list[float],
+        top_k: int,
+    ) -> list[VectorDocument]:
+        ...
+
+    @abstractmethod
+    def get_by_id(
+        self,
+        vector_id: UUID,
+    ) -> VectorDocument | None:
+        ...
+
+    @abstractmethod
+    def delete(
+        self,
+        vector_id: UUID,
+    ) -> None:
+        ...
