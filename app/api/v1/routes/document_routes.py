@@ -1,15 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.bootstrap.container import get_document_service
+from app.bootstrap.container import get_document_service, get_ingestion_service
 from sqlalchemy.orm import Session
 
 from app.application.contracts.document_schemas import DocumentCreateRequest, DocumentResponse,  DocumentUpdateRequest
 
 from app.bootstrap.container import get_document_service
 from app.infrastructure.db.deps import get_db
+from app.bootstrap.container import get_ingestion_service
 
-from app.bootstrap.container import get_embedding_service
-from app.application.ingestion.embedding_service import EmbeddingService
 from app.application.contracts.ingestion_schemas import IngestRequest
 
 
@@ -88,13 +87,28 @@ def upload_document(payload: DocumentCreateRequest, db = Depends(get_db)):
 
     return document
 
-@router.post("/ingest")
-def ingest(
+from app.application.contracts.ingestion_schemas import (
+    IngestRequest,
+    IngestResponse,
+)
+
+
+@router.post(
+    "/documents/ingest",
+    response_model=IngestResponse,
+)
+def ingest_document(
     request: IngestRequest,
     db: Session = Depends(get_db),
 ):
+    service = get_ingestion_service(db)
 
-    service = get_embedding_service(db)
+    vectors = service.ingest_text(
+        document_id=request.document_id,
+        text=request.text,
+    )
 
-    return service.ingest(request)
+    return IngestResponse(
+        vectors_created=len(vectors),
+    )
     

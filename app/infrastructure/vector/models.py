@@ -1,29 +1,25 @@
-from datetime import datetime, UTC
-from uuid import uuid4
+from datetime import UTC, datetime
+from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, Integer, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.db.session import Base
 
 
 class VectorDocumentModel(Base):
-    """
-    SQLAlchemy model for storing vector embeddings.
-    """
-
     __tablename__ = "vector_documents"
 
     id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True),
+        PG_UUID(as_uuid=True),
         primary_key=True,
         default=uuid4,
     )
 
-    document_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True),
+    document_id: Mapped[int] = mapped_column(
+        Integer,
         nullable=False,
         index=True,
     )

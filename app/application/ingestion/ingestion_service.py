@@ -50,7 +50,7 @@ class IngestionService:
 
         chunks = self.chunking_service.chunk(text)
 
-        return self.embedding_service.ingest(
+        return self.embedding_service.create_vectors(
             document_id=document_id,
             chunks=chunks,
         )

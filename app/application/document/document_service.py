@@ -11,42 +11,45 @@ class DocumentService:
         self.repo = repo
 
     def create_document(self, filename: str):
+        file_type = (
+            filename.rsplit(".", 1)[1].lower()
+            if "." in filename
+            else "unknown"
+        )
 
-        document = self.repo.create(filename=filename)
+        document = self.repo.create(
+            filename=filename,
+            file_type=file_type,
+            status=DocumentStatus.UPLOADED.value,
+        )
 
-        EventBus.publish("document_uploaded", {"document_id": document.id})
+        EventBus.publish(
+            "document_uploaded",
+            {"document_id": document.id},
+        )
 
         return self._to_response(document)
 
     def get_documents(self):
-
         documents = self.repo.get_all()
-
         return [
             self._to_response(document)
             for document in documents
         ]
 
     def get_document(self, document_id: int):
-
         document = self.repo.get_by_id(document_id)
+        if document is None:
+            raise NotFoundException("Document not found")
+        return self._to_response(document)
 
+    def update_document(self, document_id: int, data: dict):
+        document = self.repo.get_by_id(document_id)
         if document is None:
             raise NotFoundException("Document not found")
 
-        return self._to_response(document)
-
-    def update_document(self, document_id: int, filename: str | None):
-
-        document = self.repo.update(
-            document_id,
-            filename=filename
-        )
-
-        if document is None:
-            raise NotFoundException("Document not found")
-
-        return self._to_response(document)
+        updated_document = self.repo.update(document, data)
+        return self._to_response(updated_document)
 
     def delete_document(self, document_id: int):
 
@@ -54,7 +57,7 @@ class DocumentService:
         if not document:
             raise NotFoundException("Document not found")
 
-        self.repo.delete(document_id)
+        self.repo.delete(document)
         return {"message": "Document deleted successfully"}
 
     def _to_response(self, document):
