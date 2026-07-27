@@ -3,8 +3,10 @@ import tempfile
 
 from fastapi import UploadFile
 
+from app.application.contracts.upload_schemas import UploadResponse
 from app.application.document.document_service import DocumentService
 from app.application.ingestion.ingestion_service import IngestionService
+from app.domain.document.document_status import DocumentStatus
 
 
 class UploadService:
@@ -42,9 +44,9 @@ class UploadService:
             file_path=temp_path,
         )
 
-        return {
-            "document_id": document.id,
-            "filename": document.filename,
-            "status": "INGESTED",
-            "vectors_created": len(vectors),
-        }
+        return UploadResponse(
+             document_id=document.id,
+             filename=document.filename,
+             status=DocumentStatus.COMPLETED,
+             vectors_created=len(vectors),
+        )
