@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.bootstrap.container import get_document_service, get_ingestion_service
+from app.bootstrap.container import get_document_service, get_ingestion_service, get_upload_service
 from sqlalchemy.orm import Session
 
 from app.application.contracts.document_schemas import DocumentCreateRequest, DocumentResponse,  DocumentUpdateRequest
@@ -75,17 +75,15 @@ def delete_document(document_id: int, db: Session = Depends(get_db)):
 
     return {"message": "Document deleted successfully"}
 
-@router.post("/documents/upload", response_model=DocumentResponse)
-def upload_document(payload: DocumentCreateRequest, db = Depends(get_db)):
+from fastapi import File, UploadFile
 
-    service = get_document_service(db)
-
-    document = service.create_document(
-
-        filename=payload.filename
-    )
-
-    return document
+@router.post("/documents/upload")
+def upload_document(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    service = get_upload_service(db)
+    return service.upload(file)
 
 from app.application.contracts.ingestion_schemas import (
     IngestRequest,
