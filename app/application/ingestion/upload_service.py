@@ -21,32 +21,38 @@ class UploadService:
 
     def upload(self, file: UploadFile):
 
-        # Create document
-        document = self.document_service.create_document(
-            filename=file.filename,
-        )
+        temp_path = None
 
-        # Save upload temporarily
-        suffix = Path(file.filename).suffix
+        try:
 
-        with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=suffix,
-        ) as temp:
+            # Create document metadata
+            document = self.document_service.create_document(
+                filename=file.filename,
+            )
 
-            temp.write(file.file.read())
+            suffix = Path(file.filename).suffix
 
-            temp_path = Path(temp.name)
+            with tempfile.NamedTemporaryFile(
+                delete=False,
+                suffix=suffix,
+            ) as temp:
 
-        # Ingest file
-        vectors = self.ingestion_service.ingest_file(
-            document_id=document.id,
-            file_path=temp_path,
-        )
+                temp.write(file.file.read())
+                temp_path = Path(temp.name)
 
-        return UploadResponse(
-             document_id=document.id,
-             filename=document.filename,
-             status=DocumentStatus.COMPLETED,
-             vectors_created=len(vectors),
-        )
+            vectors = self.ingestion_service.ingest_file(
+                document_id=document.id,
+                file_path=temp_path,
+            )
+
+            return UploadResponse(
+                document_id=document.id,
+                filename=document.filename,
+                status=DocumentStatus.COMPLETED,
+                vectors_created=len(vectors),
+            )
+
+        finally:
+
+            if temp_path and temp_path.exists():
+                temp_path.unlink()

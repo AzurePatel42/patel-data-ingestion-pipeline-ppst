@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from app.infrastructure.db.session import Base
+from app.infrastructure.db.base import Base
 
 
 class DocumentModel(Base):
