@@ -78,7 +78,7 @@ class UploadService:
                 temp_path,
             )
 
-            vectors = self.ingestion_service.ingest_file(
+            vectors = self.ingestion_service.ingest_document(
                 document_id=document.id,
                 file_path=temp_path,
             )
