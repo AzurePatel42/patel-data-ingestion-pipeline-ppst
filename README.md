@@ -1,35 +1,293 @@
-# Phase 1: Executive Summary
-
-
 Patel Data Ingestion Pipeline
 
-The Patel Data Ingestion Pipeline is a production-ready backend service responsible for transforming raw documents into structured, AI-ready knowledge that can be searched, retrieved, and analyzed efficiently.
+Production-ready document ingestion platform built on the Patel Platform Service Template (PPST) for transforming unstructured documents into AI-ready knowledge using OpenAI embeddings, PostgreSQL, and pgvector.
 
-Built on the Patel Platform Service Template (PPST), the service provides a standardized and scalable ingestion framework capable of processing documents from multiple sources while maintaining consistency, reliability, and extensibility.
+Executive Summary
 
-The primary objective of the pipeline is to convert unstructured information into high-quality, searchable data that powers Retrieval-Augmented Generation (RAG), semantic search, intelligent assistants, and enterprise knowledge systems.
+The Patel Data Ingestion Pipeline is a production-ready backend service responsible for transforming raw, unstructured documents into structured, searchable, and AI-ready knowledge.
 
-Rather than serving as a standalone application, the Data Ingestion Pipeline acts as a foundational platform component that prepares information for downstream AI and backend services across the Patel Engineering ecosystem.
+Built on the Patel Platform Service Template (PPST), the service provides a standardized ingestion framework that automates the complete document processing lifecycle while maintaining consistency, scalability, and extensibility.
 
+The pipeline performs the following operations:
 
-# Phase 2: Problem Statement
+Document upload
+Metadata management
+Text extraction
+Text chunking
+OpenAI embedding generation
+Vector persistence using PostgreSQL + pgvector
+Document lifecycle management
 
+The resulting knowledge can be consumed by Retrieval-Augmented Generation (RAG) systems, semantic search engines, enterprise AI assistants, analytics platforms, and intelligent backend services.
 
-Modern organizations generate massive volumes of unstructured data from documents, PDFs, emails, reports, logs, manuals, spreadsheets, web pages, and other digital sources. While this information contains valuable business knowledge, it is often scattered across multiple systems and stored in formats that are difficult for applications and AI systems to consume directly.
+Rather than functioning as a standalone application, the Data Ingestion Pipeline serves as a reusable platform component within the Patel Engineering ecosystem, providing a consistent foundation for downstream AI services.
 
-Traditional software relies on structured databases where data is already organized into tables and relationships. Unstructured documents, however, require multiple transformation steps before they can support intelligent search, analytics, or Retrieval-Augmented Generation (RAG) applications.
+Problem Statement
 
-Without a standardized ingestion process, organizations commonly face challenges such as:
+Organizations generate enormous amounts of unstructured information through documents, reports, manuals, emails, spreadsheets, PDFs, web pages, and other digital assets.
 
-Duplicate or inconsistent data across multiple sources.
-Manual document processing that is slow and error-prone.
-Poor search quality due to inconsistent text extraction and indexing.
-Difficulty integrating new document sources into existing systems.
-Limited scalability as data volume continues to grow.
-Lack of observability, monitoring, and traceability throughout the ingestion process.
+Although these documents contain valuable business knowledge, they are difficult for software applications and Large Language Models (LLMs) to consume directly.
 
-These challenges become even more significant as enterprises adopt AI-powered applications that depend on high-quality, structured knowledge. Large Language Models cannot effectively retrieve or reason over documents that have not been properly extracted, cleaned, segmented, enriched, and indexed.
+Without a standardized ingestion process, organizations often experience:
 
-A reliable data ingestion pipeline solves this problem by providing a repeatable, automated, and scalable process that transforms raw information into structured, searchable knowledge. By standardizing every stage of ingestion, organizations can improve data quality, simplify maintenance, accelerate AI adoption, and establish a consistent foundation for downstream services.
+Duplicate and inconsistent information
+Manual document processing
+Poor search quality
+Inconsistent indexing
+Difficult onboarding of new document formats
+Limited scalability
+Minimal observability
+Poor document lifecycle management
 
-Within the Patel Engineering ecosystem, the Data Ingestion Pipeline serves as the knowledge preparation layer, ensuring that enterprise information is processed consistently before it is consumed by retrieval services, AI assistants, analytics platforms, and other intelligent applications.
+As AI adoption grows, these challenges become increasingly significant because Retrieval-Augmented Generation (RAG) depends on clean, structured, searchable knowledge.
+
+The Patel Data Ingestion Pipeline addresses these challenges by providing a repeatable, automated, and extensible ingestion workflow that transforms raw documents into structured vectorized knowledge suitable for enterprise AI applications.
+
+Architecture Overview
+
+The pipeline follows Clean Architecture and separates responsibilities into well-defined layers.
+
+                FastAPI API
+                     │
+                     ▼
+            Application Services
+                     │
+                     ▼
+             Domain Layer
+                     │
+                     ▼
+      Repository / Infrastructure
+                     │
+                     ▼
+ PostgreSQL + pgvector + OpenAI
+
+Major architectural principles include:
+
+Clean Architecture
+Dependency Injection
+Repository Pattern
+Service Layer
+Event-driven document lifecycle
+Global exception handling
+Centralized logging
+OpenAPI-first development
+Technology Stack
+Category	Technology
+Language	Python 3.13
+Framework	FastAPI
+ORM	SQLAlchemy
+Database	PostgreSQL
+Vector Store	pgvector
+AI	OpenAI Embeddings
+Validation	Pydantic
+Documentation	OpenAPI 3.1 / Swagger
+Architecture	Clean Architecture
+Dependency Injection	PPST Container
+Logging	Python Logging
+Containerization	Docker
+Version Control	Git / GitHub
+System Architecture Diagram
+                    Client
+                      │
+                      ▼
+               FastAPI REST API
+                      │
+                      ▼
+               Upload Service
+                      │
+                      ▼
+             Document Service
+                      │
+                      ▼
+            Ingestion Service
+                      │
+        ┌─────────────┼─────────────┐
+        ▼             ▼             ▼
+ Text Extraction   Chunking   Embeddings
+        │                           │
+        └─────────────┬─────────────┘
+                      ▼
+           PostgreSQL + pgvector
+                      │
+                      ▼
+          AI-ready Searchable Knowledge
+Project Structure
+app/
+│
+├── api/
+│   └── v1/
+│       └── routes/
+│
+├── application/
+│   ├── contracts/
+│   ├── document/
+│   ├── ingestion/
+│   └── extraction/
+│
+├── bootstrap/
+│
+├── core/
+│   ├── config.py
+│   ├── exceptions.py
+│   ├── handlers.py
+│   └── logging.py
+│
+├── domain/
+│
+├── events/
+│
+├── infrastructure/
+│   ├── db/
+│   ├── repositories/
+│   ├── vector/
+│   └── logging/
+│
+└── main.py
+Features
+
+Current capabilities include:
+
+Document metadata management
+Automatic document upload
+Temporary file management
+Text extraction
+Text chunking
+OpenAI embedding generation
+PostgreSQL vector persistence
+pgvector integration
+Global exception handling
+Structured logging
+Repository pattern
+Dependency injection
+OpenAPI documentation
+Health monitoring
+Document lifecycle management
+API Endpoints
+Method	Endpoint	Description
+GET	/health	Service health check
+POST	/documents	Create document metadata
+GET	/documents	Retrieve all documents
+GET	/documents/{id}	Retrieve document
+DELETE	/documents/{id}	Delete document
+POST	/documents/upload	Upload and ingest document
+POST	/documents/ingest	Ingest raw text
+Document Lifecycle
+Document Created
+        │
+        ▼
+UPLOADED
+        │
+        ▼
+Text Extraction
+        │
+        ▼
+Chunking
+        │
+        ▼
+Embedding Generation
+        │
+        ▼
+Vector Persistence
+        │
+        ▼
+COMPLETED
+
+Future asynchronous processing:
+
+UPLOADED
+     │
+     ▼
+QUEUED
+     │
+     ▼
+PROCESSING
+     │
+     ▼
+COMPLETED
+Future Roadmap
+v0.2
+Extractor Factory
+TXT support
+Markdown support
+PDF support
+DOCX support
+HTML support
+CSV support
+JSON support
+v0.3
+Retrieval Service
+Semantic Search
+Top-K Similarity Search
+Query Embeddings
+Ranking
+v1.0
+Azure Blob Storage
+Azure Queue Storage
+Background Workers
+Asynchronous Processing
+Azure Container Apps
+Azure Monitor
+Production Deployment
+Getting Started
+
+Clone the repository:
+
+git clone https://github.com/AzurePatel42/patel-data-ingestion-pipeline-ppst.git
+
+cd patel-data-ingestion-pipeline-ppst
+
+Create a virtual environment:
+
+python -m venv .venv
+
+Activate the environment:
+
+Windows
+
+.venv\Scripts\activate
+
+Linux/macOS
+
+source .venv/bin/activate
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+Configure your environment variables:
+
+OPENAI_API_KEY=your_api_key
+DATABASE_URL=postgresql://...
+Running Locally
+
+Start PostgreSQL (with pgvector enabled), then launch the application:
+
+uvicorn app.main:app --reload
+
+Open:
+
+http://localhost:8000/docs
+
+Swagger UI provides the interactive OpenAPI documentation.
+
+Testing
+
+Run the test suite:
+
+pytest
+
+Recommended test coverage includes:
+
+Document Service
+Upload Service
+Ingestion Service
+Repository Layer
+API Endpoints
+Exception Handling
+Document Lifecycle
+Vector Persistence
+License
+
+This project is licensed under the MIT License.
+
+See the LICENSE file for additional information.
