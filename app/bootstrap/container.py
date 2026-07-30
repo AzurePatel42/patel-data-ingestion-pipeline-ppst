@@ -9,11 +9,15 @@ from app.infrastructure.vector.pgvector_repository import PgVectorRepository
 
 
 def get_document_service(db: Session) -> DocumentService:
-    return DocumentService(DocumentRepository(db))
+    return DocumentService(
+        DocumentRepository(db),
+    )
 
 
 def get_embedding_service(db: Session) -> EmbeddingService:
-    return EmbeddingService(PgVectorRepository(db))
+    return EmbeddingService(
+        PgVectorRepository(db),
+    )
 
 
 def get_ingestion_service(db: Session) -> IngestionService:
@@ -23,8 +27,8 @@ def get_ingestion_service(db: Session) -> IngestionService:
         embedding_service=embedding_service,
     )
 
-def get_upload_service(db):
 
+def get_upload_service(db: Session) -> UploadService:
     document_service = get_document_service(db)
     ingestion_service = get_ingestion_service(db)
 
