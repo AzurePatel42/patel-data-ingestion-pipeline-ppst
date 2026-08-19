@@ -89,9 +89,16 @@ class UploadService:
                 document.id,
             )
 
+            completed_document = (
+                self.document_service.update_document_status(
+                    document.id,
+                    DocumentStatus.COMPLETED,
+                )
+            )
+
             response = UploadResponse(
-                document_id=document.id,
-                filename=document.filename,
+                document_id=completed_document.id,
+                filename=completed_document.filename,
                 status=DocumentStatus.COMPLETED,
                 vectors_created=len(vectors),
             )
