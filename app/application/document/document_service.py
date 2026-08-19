@@ -1,5 +1,4 @@
 import logging
-from uuid import UUID
 
 from app.application.contracts.document_schemas import DocumentResponse
 from app.core.exceptions import NotFoundException
@@ -65,7 +64,7 @@ class DocumentService:
 
     def get_document(
         self,
-        document_id: UUID,
+        document_id: int,
     ) -> DocumentResponse:
         """
         Retrieve a document by ID.
@@ -87,7 +86,7 @@ class DocumentService:
 
     def update_document(
         self,
-        document_id: UUID,
+        document_id: int,
         data: dict,
     ) -> DocumentResponse:
         """
@@ -115,7 +114,7 @@ class DocumentService:
 
     def delete_document(
         self,
-        document_id: UUID,
+        document_id: int,
     ) -> None:
         """
         Delete a document.
@@ -137,7 +136,7 @@ class DocumentService:
 
     def update_document_status(
         self,
-        document_id: UUID,
+        document_id: int,
         status: DocumentStatus,
     ) -> DocumentResponse:
         """

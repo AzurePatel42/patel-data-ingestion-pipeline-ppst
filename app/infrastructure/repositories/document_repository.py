@@ -1,5 +1,4 @@
 import logging
-from uuid import UUID
 
 from app.infrastructure.db.models import DocumentModel
 
@@ -50,7 +49,7 @@ class DocumentRepository:
 
     def get_by_id(
         self,
-        document_id: UUID,
+        document_id: int,
     ) -> DocumentModel | None:
         """
         Retrieve a document by ID.

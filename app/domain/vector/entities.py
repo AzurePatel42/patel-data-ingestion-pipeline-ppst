@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import List
 from uuid import UUID
 from datetime import datetime
 
@@ -11,9 +10,9 @@ class VectorDocument:
     """
 
     id: UUID
-    document_id: UUID
+    document_id: int
     chunk_index: int
     content: str
-    embedding: List[float]
+    embedding: list[float]
     embedding_model: str
     created_at: datetime

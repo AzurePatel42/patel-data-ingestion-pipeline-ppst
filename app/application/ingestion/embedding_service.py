@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 
 from app.application.ingestion.providers.embedding_provider import EmbeddingProvider
 from app.application.ingestion.providers.openai_provider import OpenAIEmbeddingProvider
+from app.core.exceptions import EmbeddingProviderException
 from app.domain.vector.entities import VectorDocument
 from app.domain.vector.repository import VectorRepository
 
@@ -28,7 +29,7 @@ class EmbeddingService:
 
     def create_vectors(
         self,
-        document_id: UUID,
+        document_id: int,
         chunks: list[str],
     ) -> list[VectorDocument]:
         """
@@ -41,20 +42,29 @@ class EmbeddingService:
 
         Returns:
             List of persisted VectorDocument objects.
+
+        Raises:
+            EmbeddingProviderException:
+                If the embedding provider fails or returns
+                an unexpected number of embeddings.
         """
 
         if not chunks:
             return []
 
-        try:
-            embeddings = self.provider.generate(chunks)
-        except Exception as exc:
-            # Replace with EmbeddingGenerationError in a future iteration.
-            raise RuntimeError("Failed to generate embeddings.") from exc
+        embeddings = self.provider.generate(chunks)
+
+        if len(embeddings) != len(chunks):
+            raise EmbeddingProviderException(
+                "Embedding provider returned an unexpected "
+                "number of embeddings."
+            )
 
         vector_documents: list[VectorDocument] = []
 
-        for index, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
+        for index, (chunk, embedding) in enumerate(
+            zip(chunks, embeddings)
+        ):
             vector_documents.append(
                 VectorDocument(
                     id=uuid4(),
@@ -67,7 +77,7 @@ class EmbeddingService:
                 )
             )
 
-        # Batch persistence (recommended)
+        # Batch persistence
         self.vector_repository.save_all(vector_documents)
 
         return vector_documents
@@ -93,8 +103,9 @@ class EmbeddingService:
         vector_id: UUID,
     ) -> VectorDocument | None:
         """
-        Retrieve a vector document by ID.
+        Retrieve a stored vector document by ID.
         """
+
         return self.vector_repository.get_by_id(vector_id)
 
     def delete_vector(
@@ -104,4 +115,5 @@ class EmbeddingService:
         """
         Delete a stored vector document.
         """
+
         self.vector_repository.delete(vector_id)

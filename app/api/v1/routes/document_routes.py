@@ -1,5 +1,4 @@
 from typing import List
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
@@ -66,7 +65,7 @@ def get_documents(
     response_model=DocumentResponse,
 )
 def get_document(
-    document_id: UUID,
+    document_id: int,
     db: Session = Depends(get_db),
 ):
     """
@@ -82,7 +81,7 @@ def get_document(
     status_code=204,
 )
 def delete_document(
-    document_id: UUID,
+    document_id: int,
     db: Session = Depends(get_db),
 ):
     """

@@ -1,9 +1,9 @@
 from pathlib import Path
-from uuid import UUID
 
 from app.application.extraction.extractor_factory import ExtractorFactory
 from app.application.ingestion.chunking_service import ChunkingService
 from app.application.ingestion.embedding_service import EmbeddingService
+from app.core.exceptions import EmptyDocumentException
 from app.domain.vector.entities import VectorDocument
 
 
@@ -17,6 +17,8 @@ class IngestionService:
     ExtractorFactory
           ↓
     Document Extractor
+          ↓
+    Text Validation
           ↓
     Chunking
           ↓
@@ -35,12 +37,21 @@ class IngestionService:
 
     def ingest_text(
         self,
-        document_id: UUID,
+        document_id: int,
         text: str,
     ) -> list[VectorDocument]:
         """
         Ingest raw text into the vector database.
+
+        Raises:
+            EmptyDocumentException:
+                If the supplied text is empty or contains only whitespace.
         """
+
+        if not text or not text.strip():
+            raise EmptyDocumentException(
+                "Document contains no extractable text."
+            )
 
         chunks = self.chunking_service.chunk(text)
 
@@ -51,7 +62,7 @@ class IngestionService:
 
     def ingest_document(
         self,
-        document_id: UUID,
+        document_id: int,
         file_path: Path,
     ) -> list[VectorDocument]:
         """
